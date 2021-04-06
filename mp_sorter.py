@@ -6,7 +6,9 @@ and then to place these in the corresponding output directories in an MP directo
 import os
 import logging
 import shutil
+import pandas
 from ij import IJ
+import csv
 
 
 def main(tiff_dir, analysis_dir):
@@ -86,6 +88,8 @@ def movevectorfiles(tiff_dir, analysis_dir):
                         os.remove(vec_rnme)
                     logging.info("Renaming %s to %s" % (final_dest, vec_rnme))
                     os.rename(final_dest, vec_rnme)
+                    df1 = pandas.read_csv(vec_rnme, header=None)
+                    df1.to_csv(vec_rnme, header=["Position X", "Position Y"])
                 except Exception as e:
                     logging.exception(str(e))
 
