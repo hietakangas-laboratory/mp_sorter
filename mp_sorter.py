@@ -6,7 +6,6 @@ and then to place these in the corresponding output directories in an MP directo
 import os
 import logging
 import shutil
-import pandas
 from ij import IJ
 import csv
 
@@ -78,18 +77,16 @@ def movevectorfiles(tiff_dir, analysis_dir):
                     logging.info("Making directory for MP statistics: %s" % mpdirpath)
                     if not os.path.exists(mpdirpath):
                         os.mkdir(mpdirpath)
-                    final_dest = os.path.join(mpdirpath, os.path.basename(mppath))
                     logging.info("Moving %s to %s" % (mppath, mpdirpath))
-                    shutil.move(mppath, final_dest)
-                    vec_rnme = mpdirpath + "\Position.csv"
-                    logging.info(vec_rnme)
-                    logging.info("Removing old Vector.csv or Vector.txt files if any")
-                    if os.path.exists(vec_rnme):
-                        os.remove(vec_rnme)
-                    logging.info("Renaming %s to %s" % (final_dest, vec_rnme))
-                    os.rename(final_dest, vec_rnme)
-                    df1 = pandas.read_csv(vec_rnme, header=None)
-                    df1.to_csv(vec_rnme, header=["Position X", "Position Y"])
+                    final_csv = mpdirpath + "\Position.csv"
+                    logging.info("Removing old MP files if any")
+                    if os.path.exists(final_csv):
+                        os.remove(final_csv)
+                    with open(mppath) as fr, open(final_csv, "wb") as fw:
+                        cr = csv.reader(fr, delimiter='\t')
+                        cw = csv.writer(fw, delimiter=',')
+                        cw.writerow(["Position X", "Position Y"])
+                        cw.writerows(cr)
                 except Exception as e:
                     logging.exception(str(e))
 
